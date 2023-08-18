@@ -8,19 +8,18 @@ final class Lib1401Tests: XCTestCase {
     ]
 
     let inputString = ",0080015,022029,M077211"
-    let inputStringInvalid = "InvalidInputString"
+    let inputStringInvalid = " ö§§"
 
     func testEncode() throws {
-        let encoded = try Lib1401.BCEncoder.shared.encode(with: inputString)
-        XCTAssertEqual(inputBytes, encoded)
+        XCTAssertEqual(inputBytes, try Lib1401.CharacterEncodings.shared.encode(code: inputString))
     }
 
     func testDecode() throws {
-        let decoded = try Lib1401.BCEncoder.shared.decode(from: Data(inputBytes))
+        let decoded = try Lib1401.CharacterEncodings.shared.decode(from: Data(inputBytes))
         XCTAssertEqual(decoded, inputString)
     }
 
     func testInvalid() throws {
-        XCTAssertThrowsError(try Lib1401.BCEncoder.shared.encode(with: inputStringInvalid))
+        XCTAssertThrowsError(try Lib1401.CharacterEncodings.shared.encode(code: inputStringInvalid))
     }
 }

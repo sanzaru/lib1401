@@ -1,8 +1,17 @@
+import Foundation
+
 public struct Lib1401 {
+    /// Character encoding functions and definitions for the IBM 1401
+    /// The encoding is based on the SIMH encoding
+    /// - seealso:  [https://github.com/simh/simh](https://github.com/simh/simh)
     public struct CharacterEncodings {
         public static let shared = CharacterEncodings()
 
-        // Default SimH encoding
+        enum EncodingError: Error {
+            case invalidCharacter(Character)
+        }
+
+        /// Default SimH encoding
         public let simh: [Character: UInt8] = [
             "A": 0b00110001, "B": 0b00110010, "C": 0b01110011, "D": 0b00110100,
             "E": 0b01110101, "F": 0b01110110, "G": 0b00110111, "H": 0b00111000,
@@ -21,17 +30,36 @@ public struct Lib1401 {
             "]": 0b01101101, ";": 0b01101110, "_": 0b00101111, "?": 0b01111010,
             "[": 0b00111101, "<": 0b00111110, "\"": 0b01111111
         ]
+        
+        /// Encode given string
+        /// - Parameter code: The string to encode
+        /// - Returns: Array with the encoded bytes
+        public func encode(code: String) throws -> [UInt8] {
+            try code.uppercased().map({
+                if let item = simh[$0] {
+                    return item
+                }
 
-        public func encode(code: String) -> [UInt8] {
-            code.uppercased().map({ simh[$0] ?? 0 })
+                throw(EncodingError.invalidCharacter($0))
+            })
         }
-
+        
+        /// Decode given UInt8 array to string
+        /// - Parameter words: Array of bytes to decode
+        /// - Returns: String with the decoded message
         public func decode(words: [UInt8]) -> String? {
             let decoded = words.compactMap({ word in
                 return simh.first(where: { $0.value == word })?.key
             })
 
             return String(decoded)
+        }
+
+        /// Decode given Data to string
+        /// - Parameter words: Array of bytes to decode
+        /// - Returns: String with the decoded message
+        public func decode(from data: Data) throws -> String? {
+            return decode(words: data.map({ UInt8($0) }))
         }
     }
 }
