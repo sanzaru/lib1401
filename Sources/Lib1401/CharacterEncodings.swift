@@ -35,7 +35,9 @@ public extension Lib1401 {
         /// - Parameter code: The string to encode
         /// - Returns: Array with the encoded bytes
         public func encode(code: String) throws -> [UInt8] {
-            try code.uppercased().map({
+            try code.uppercased().compactMap({
+                if $0 == "\n" { return nil } // Ignore newline characters
+
                 if let item = simh[$0] {
                     return item
                 }
