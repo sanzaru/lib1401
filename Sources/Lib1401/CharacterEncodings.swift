@@ -65,7 +65,7 @@ public extension Lib1401 {
         /// - Returns: String with the decoded message
         public func decode(words: [UInt8]) -> String? {
             let decoded = words.compactMap({ word in
-                return simh.first(where: { $0.value == word })?.key
+                return simh.first(where: { $0.value == word & 0b01111111 })?.key
             })
 
             return String(decoded)
